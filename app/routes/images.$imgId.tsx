@@ -13,9 +13,9 @@ import { requireUserId } from "~/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.imgId, "noteId not found");
 
-  const image = await getImage({ id: params.noteId, userId });
+  const image = await getImage({ id: params.imgId, userId });
   if (!image) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -24,11 +24,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request);
-  invariant(params.noteId, "noteId not found");
+  invariant(params.imgId, "noteId not found");
 
-  await deleteImage({ id: params.noteId, userId });
+  await deleteImage({ id: params.imgId, userId });
 
-  return redirect("/notes");
+  return redirect("/images");
 };
 
 export default function NoteDetailsPage() {
@@ -37,8 +37,12 @@ export default function NoteDetailsPage() {
   return (
     <div>
       <h3 className="text-2xl font-bold">{data.image.id}</h3>
+      <img
+      src={data.image.originalUrl}
+      />
       <hr className="my-4" />
       <Form method="post">
+        <input type="hidden" name="imgId" value={data.image.id} />
         <button
           type="submit"
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"

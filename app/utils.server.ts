@@ -7,7 +7,6 @@ import path from "path";
 export const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 
-
 export const uploadHandler: UploadHandler = async ({ name, contentType, data, filename }) => {
   if (name !== "image") {
     return undefined;
@@ -17,32 +16,21 @@ export const uploadHandler: UploadHandler = async ({ name, contentType, data, fi
     return undefined;
   }
 
-  const extension = path.extname(filename).toLowerCase();
-  const allowedExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
-  if (!allowedExtensions.includes(extension)) {
+  const extension = path.extname(filename);
+  if (![".png", ".jpg", ".jpeg", ".gif", ".webp"].includes(extension.toLowerCase())) {
     return undefined;
   }
 
-  // Additional content type validation (optional)
-  const allowedContentTypes = ["image/png", "image/jpeg", "image/gif", "image/webp"];
-  if (!allowedContentTypes.includes(contentType || "")) {
-    return undefined;
-  }
+  // Ensure the upload directory exists
+  await mkdir(UPLOAD_DIR, { recursive: true });
 
-  try {
-    // Ensure the upload directory exists
-    await mkdir(UPLOAD_DIR, { recursive: true });
+  const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${extension}`;
+  const filePath = path.join(UPLOAD_DIR, uniqueFilename);
 
-    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}${extension}`;
-    const filePath = path.join(UPLOAD_DIR, uniqueFilename);
+  // Write the file to the server
+  await writeAsyncIterableToWritable(data, createWriteStream(filePath));
 
-    // Write the file to the server
-    await writeAsyncIterableToWritable(data, createWriteStream(filePath));
-
-    // Return the public URL of the uploaded file
-    return `/uploads/${uniqueFilename}`;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    return undefined;
-  }
+  // Return the public URL of the uploaded file
+  return `/uploads/${uniqueFilename}`;
 };
+

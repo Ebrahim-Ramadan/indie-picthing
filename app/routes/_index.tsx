@@ -10,7 +10,7 @@ export default function Index() {
   console.log('user', user);
   
   return (
-    <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
+    <main className="relative min-h-screen bg-black sm:flex sm:items-center sm:justify-center">
      ass
     </main>
   );
