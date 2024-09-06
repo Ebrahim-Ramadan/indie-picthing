@@ -8,25 +8,25 @@ import {
 } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { deleteNote, getNote } from "~/models/note.server";
+import { deleteImage, getImage } from "~/models/image.server";
 import { requireUserId } from "~/session.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
   invariant(params.noteId, "noteId not found");
 
-  const note = await getNote({ id: params.noteId, userId });
-  if (!note) {
+  const image = await getImage({ id: params.noteId, userId });
+  if (!image) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ note });
+  return json({ image });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request);
   invariant(params.noteId, "noteId not found");
 
-  await deleteNote({ id: params.noteId, userId });
+  await deleteImage({ id: params.noteId, userId });
 
   return redirect("/notes");
 };
@@ -36,8 +36,7 @@ export default function NoteDetailsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.note.title}</h3>
-      <p className="py-6">{data.note.body}</p>
+      <h3 className="text-2xl font-bold">{data.image.id}</h3>
       <hr className="my-4" />
       <Form method="post">
         <button
